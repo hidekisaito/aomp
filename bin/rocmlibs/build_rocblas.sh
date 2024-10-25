@@ -14,23 +14,17 @@ thisdir=`dirname $realpath`
 _repo_dir=$AOMP_REPOS/rocmlibs/rocBLAS
 _build_dir=$_repo_dir/build
 
-AOMP_BUILD_TENSILE=${AOMP_BUILD_TENSILE:-0}
-
-if [ $AOMP_BUILD_TENSILE == 0 ] ; then 
-   echo 
-   echo "WARNING: Building rocblas without Tensile"
-   _local_tensile_opt=""
-else
-   _tensile_repo_dir=$AOMP_REPOS/rocmlibs/Tensile
-   _cwd=$PWD
-   cd $_tensile_repo_dir
-   git checkout release/rocm-rel-6.2
-   git pull
-   # FIXME:  We should get the Tensile hash from rocBLAS/tensile_tag.txt
-   git checkout 09ec3476785198159195e2b8d635db13733682d4
-   cd $_cwd
-   _local_tensile_opt="--test_local_path=$_tensile_repo_dir"
-fi
+_tensile_repo_dir=$AOMP_REPOS/rocmlibs/Tensile
+_cwd=$PWD
+cd $_tensile_repo_dir
+git checkout release/rocm-rel-6.2
+git pull
+# Read the commit SHA from the file rocBLAS/tensile_tag.txt
+_tensile_commit_sha=$(cat $_repo_dir/tensile_tag.txt)
+# Checkout the specific commit SHA
+git checkout $_tensile_commit_sha
+cd $_cwd
+_local_tensile_opt="--test_local_path=$_tensile_repo_dir"
 
 patchrepo $_repo_dir
 
@@ -99,11 +93,9 @@ if [ "$1" != "install" ] ; then
    echo rm -rf $_build_dir
    rm -rf $_build_dir
    mkdir -p $_build_dir
-   if [ $AOMP_BUILD_TENSILE != 0 ] ; then 
-      # Cleanup possible old tensile build area
-      echo rm -rf $_tensile_repo_dir/build
-      rm -rf $_tensile_repo_dir/build
-   fi
+   # Cleanup possible old tensile build area
+   echo rm -rf $_tensile_repo_dir/build
+   rm -rf $_tensile_repo_dir/build
 else
    if [ ! -d $_build_dir ] ; then 
       echo "ERROR: The build directory $_build_dir"
@@ -125,7 +117,6 @@ $_local_tensile_opt \
 --install_invoked \
 --build_dir $_build_dir \
 --src_path=$_repo_dir \
---no_tensile \
 --jobs=$AOMP_JOB_THREADS \
 --architecture="""$_gfxlist""" \
 "
