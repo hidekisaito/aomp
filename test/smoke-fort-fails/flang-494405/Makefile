@@ -1,10 +1,7 @@
-NOOPT        = 1
-#NOOMP        = 1
-#OMP_FLAGS    = -fopenmp
 include ../../Makefile.defs
 
-TESTNAME     = assumed
-TESTSRC_MAIN = assumed.f90
+TESTNAME     = redprob
+TESTSRC_MAIN = redprob.f90
 TESTSRC_AUX  =
 TESTSRC_ALL  = $(TESTSRC_MAIN) $(TESTSRC_AUX)
 
@@ -14,6 +11,8 @@ CC           = $(OMP_BIN) $(VERBOSE)
 #-ccc-print-phases
 #"-\#\#\#"
 
-RUNCMD       = ./${TESTNAME} 2>&1 | tee ${TESTNAME}.out 2>&1 && diff ${TESTNAME}.out chk.stdout
-
 include ../Makefile.rules
+run: $(TESTNAME)
+	ulimit -s unlimited ; \
+	rocprof --stats ./$(TESTNAME) > run.log 2>&1 ; \
+	column -t -s  ,  < results.stats.csv
