@@ -4,7 +4,7 @@ include ../../Makefile.defs
 # cmake and actual execution.
 # Hence, we build a dummy target to remain compliant.
 
-TESTNAME     = veccopy-ompt-target-cmake
+TESTNAME     = omptest-device-emi
 TESTSRC_MAIN =
 TESTSRC_AUX  =
 TESTSRC_ALL  = $(TESTSRC_MAIN) $(TESTSRC_AUX)
@@ -14,6 +14,8 @@ RUNCMD       = ./performBuildRun.sh -a $(AOMP) -t $(AOMP_GPU)
 
 CLANG        ?= clang
 OMP_BIN      = $(AOMP)/bin/$(CLANG)
+RUNENV       += OMPTEST_USE_OMPT_EMI=1
+RUNENV       += OMPTEST_USE_OMPT_TRACING=1
 RUNENV       += OMPTEST_RUN_AS_TESTSUITE=1
 DUMMYOPT     = $(VERBOSE) -x c -
 CC           = $(DUMMYSRC) | $(OMP_BIN) $(DUMMYOPT)
