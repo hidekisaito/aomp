@@ -148,6 +148,29 @@ if [ "$1" != "nocmake" ] && [ "$1" != "install" ] ; then
         exit 1
      fi
   fi
+  if [ "$AOMP_BUILD_DEBUG" == 1 ]; then
+    if [ -d "$BUILD_DIR/build/hipamd_debug" ] ; then
+       echo
+       echo "FRESH START , CLEANING UP FROM PREVIOUS BUILD"
+       echo rm -rf $BUILD_DIR/build/hipamd_debug
+       rm -rf $BUILD_DIR/build/hipamd_debug
+    fi
+
+     echo mkdir -p $BUILD_DIR/build/hipamd_debug
+     mkdir -p $BUILD_DIR/build/hipamd_debug
+     echo cd $BUILD_DIR/build/hipamd_debug
+     cd $BUILD_DIR/build/hipamd_debug
+     echo
+     echo " -----Running hipamd-debug cmake -----"
+     _prefix_map="\""-fdebug-prefix-map=$HIPAMD_DIR=$_ompd_src_dir/clr"\""
+     echo ${AOMP_CMAKE} $HIPAMD_DEBUG_CMAKE_OPTS -DCMAKE_CXX_FLAGS="-g $_prefix_map" -DCMAKE_C_FLAGS="-g $_prefix_map" $HIPAMD_DIR
+     ${AOMP_CMAKE} $HIPAMD_DEBUG_CMAKE_OPTS -DCMAKE_CXX_FLAGS="-g $_prefix_map" -DCMAKE_C_FLAGS="-g $_prefix_map" $HIPAMD_DIR
+     if [ $? != 0 ] ; then
+        echo "ERROR hipamd-debug cmake failed. Cmake flags"
+        echo "      $HIPAMD_DEBUG_CMAKE_OPTS"
+        exit 1
+     fi
+  fi
 fi
 
 if [ "$1" = "cmake" ]; then
