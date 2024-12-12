@@ -20,6 +20,7 @@ TESTS_DIR = \
     flang-464660-2 \
     flang-469194 \
     flang-471982 \
+    flang-476122a \
     flang-480581 \
     flang-485161 \
     flang-485265 \
@@ -28,11 +29,14 @@ TESTS_DIR = \
     flang-gpu-stop-string \
     flang-gpu-exit \
     flang-gpu-abort \
+    hellofort-io \
     mathdbl-tgt \
     mathquad-tgt \
     olcf-tf-7-loop-combined \
     rocm-aomp-issue-842 \
     rocm-aomp-issue-1148 \
+    rocm-issue-201 \
+    rocm-issue-208 \
     split-dist-f90 \
     split-dist-par-c \
     split-dist-par-f90 \

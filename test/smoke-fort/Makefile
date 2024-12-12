@@ -55,7 +55,6 @@ TESTS_DIR = \
     flang-471469 \
     flang-472452 \
     flang-476122 \
-    flang-476122a \
     flang-478281 \
     flang-479382 \
     flang-479382-1 \
@@ -65,6 +64,7 @@ TESTS_DIR = \
     flang-479382-5 \
     flang-nested-parallel-do-loops \
     flang-use-device \
+    hellofort-nio \
     intrin-rename-func \
     intrin-rename-sub \
     iso_flush \
@@ -94,6 +94,7 @@ TESTS_DIR = \
     olcf-tf-4-openmp-gpu-teams-parallel-data \
     olcf-tf-5-openmp-gpu-teams-parallel-implicit-map \
     olcf-tf-6-combined \
+    rocm-issue-202 \
     single-value-map \
     target-cray-pointer \
     teams-distribute-no-parallel \

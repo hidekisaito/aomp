@@ -23,12 +23,17 @@ WEBSITE="http\:\/\/github.com\/ROCm-Developer-Tools\/aomp"
 
 # Check-openmp prep
 # Patch rocr
-REPO_DIR=$AOMP_REPOS/$AOMP_ROCR_REPO_NAME
-patchrepo $REPO_DIR
+ROCR_REPO_DIR=$AOMP_REPOS/$AOMP_ROCR_REPO_NAME
+patchrepo $ROCR_REPO_DIR
 
-# Patch rocm-device-libs
+# Patch llvm-project with ATD patch customized for amd-staging.
+# WARNING: This patch (ATD_ASO_full.patch) rarely applies cleanly
+#          because of its size and constant trunk merges to amd-staging.
+#          This is why default is 0 (OFF).
 REPO_DIR=$AOMP_REPOS/$AOMP_PROJECT_REPO_NAME
-patchrepo $REPO_DIR
+if [ "$AOMP_APPLY_ATD_AMD_STAGING_PATCH"  == 1 ] ; then
+   patchrepo $REPO_DIR
+fi
 
 # End check-openmp prep
 
@@ -97,9 +102,11 @@ MYCMAKEOPTS="-DCMAKE_BUILD_TYPE=$BUILD_TYPE
  -DLLVM_BUILD_LLVM_DYLIB=ON
  -DLLVM_LINK_LLVM_DYLIB=ON
  -DCLANG_LINK_CLANG_DYLIB=ON
- -DLIBOMPTARGET_EXTERNAL_PROJECT_HSA_PATH=$AOMP_REPOS/$AOMP_ROCR_REPO_NAME/src
- -DLIBOMPTARGET_EXTERNAL_PROJECT_THUNK_PATH=$AOMP_REPOS/$AOMP_ROCT_REPO_NAME
+ -DLIBOMPTARGET_EXTERNAL_PROJECT_HSA_PATH=$AOMP_REPOS/$AOMP_ROCR_REPO_NAME
+ -DOFFLOAD_EXTERNAL_PROJECT_UNIFIED_ROCR=On
  -DLIBOMPTARGET_EXTERNAL_PROJECT_ROCM_DEVICE_LIBS_PATH=$AOMP_REPOS/$AOMP_PROJECT_REPO_NAME/amd/device-libs
+ -DLLVM_EXTERNAL_PROJECTS=SPIRV_TRANSLATOR
+ -DLLVM_EXTERNAL_SPIRV_TRANSLATOR_SOURCE_DIR=$AOMP_REPOS/SPIRV-LLVM-Translator
  -DROCM_DEVICE_LIBS_INSTALL_PREFIX_PATH=$AOMP_INSTALL_DIR
  -DROCM_DEVICE_LIBS_BITCODE_INSTALL_LOC=$rocmdevicelib_loc_new
  -DROCM_LLVM_BACKWARD_COMPAT_LINK="$AOMP_INSTALL_DIR/llvm"
@@ -278,9 +285,10 @@ if [ "$1" == "install" ] ; then
    echo
    echo "SUCCESSFUL INSTALL to $INSTALL_PROJECT with link to $AOMP"
    echo
-   removepatch $REPO_DIR
-   REPO_DIR=$AOMP_REPOS/$AOMP_ROCR_REPO_NAME
-   removepatch $REPO_DIR
+   if [ "$AOMP_APPLY_ATD_AMD_STAGING_PATCH"  == 1 ] ; then
+      removepatch $REPO_DIR
+   fi
+   removepatch $ROCR_REPO_DIR
    amd_compiler_symlinks=("amdclang" "amdclang++" "amdclang-cl" "amdclang-cpp" "amdflang" "amdlld")
    if [ "$AOMP_SKIP_FLANG_NEW" == 1 ]; then
      amd_compiler_cfg=("clang" "clang++" "clang-cpp" "clang-${AOMP_MAJOR_VERSION}" "clang-cl" "flang")
